@@ -1,0 +1,30 @@
+name: Snake
+
+on:
+  # Schedule updates: At 23:00 in UTC+9
+  schedule: [{ cron: '0 14 * * *' }]
+  # Lines below let you run workflow manually and on each commit
+  workflow_dispatch:
+  push: { branches: ['master', 'main'] }
+
+jobs:
+  snake:
+    runs-on: ubuntu-latest
+    steps:
+      # generates a snake game from a github user (<github_user_name>) contributions graph, output a svg animation at <svg_out_path>
+      - name: generate snake
+        if: ${{ success() || failure() }}
+        uses: Platane/snk@master
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          svg_out_path: images/snake.svg
+
+      # push the content of <build_dir> to a branch
+      # the content will be available at https://raw.githubusercontent.com/<github_user>/<repository>/<target_branch>/<file> , or as github page
+      - name: push snake
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: snake
+          build_dir: images
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
